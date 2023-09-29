@@ -3,6 +3,7 @@ import requests
 import access
 
 # /accounts/private/v1/admin/requests/csv/import
+# send post request with file each minute for 60 minutes
 # specify api and creds
 api_url = ""
 email = ""
