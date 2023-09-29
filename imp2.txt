@@ -1,0 +1,5 @@
+Username,Account number,Debit/Credit,Amount,Description,Revenue,Apply IWT Fee
+igqa,43242423432,credit,1,credit,yes,no
+igqa,43242423432,credit,2,credit,no,no
+igqa,43242423432,credit,3,debit,yes,no
+igqa,43242423432,credit,4,credit,yes,no
