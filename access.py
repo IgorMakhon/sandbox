@@ -1,23 +1,19 @@
 import requests
 
 
-def get_tokens():
-    url_login = "https://api-mob1.ebanq-qa.com/users/public/v1/auth/signin"
+#  def for getting access token and token_signature
+def get_tokens(url, email, password):
+    url_login = f"{url}/users/public/v1/auth/signin"
     headers_login = {
         "Accept": "application/json, text/plain, */*",
         "Accept-Language": "en,es;q=0.9,ru;q=0.8,ru-RU;q=0.7,en-US;q=0.6,de;q=0.5",
         "Connection": "keep-alive",
-        "Content-Type": "application/json",
-        "Origin": "<https://mob1.ebanq-qa.com>",
-        "Referer": "<https://mob1.ebanq-qa.com/>",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-site"
+        "Content-Type": "application/json"
     }
     payload = {
         "data": {
-            "email": "igad",
-            "password": "Password1!"
+            "email": f"{email}",
+            "password": f"{password}"
         }
     }
 
@@ -28,4 +24,4 @@ def get_tokens():
         token_signature = response.cookies.get("token_signature")
         return [access_token, token_signature]
     else:
-        print(f"Error: {response.status_code} - {response.json()}")
+        return f"Error: {response.status_code} - {response.json()}"
