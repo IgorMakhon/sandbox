@@ -50,52 +50,56 @@ print(str(log_dict))
 print("Count_logs", count_logs)
 
 
-# def datetime_converter_searcher(log_dictionary, datetime_to_search):
-#     if datetime_to_search[:3] == '../' and len(datetime_to_search) == 26:
-#         search_to = datetime.strptime(datetime_to_search[3:], "%Y-%m-%d %H:%M:%S.%f")
-#         search_results = {}
-#         for log_datetime, log_text in log_dictionary.items():
-#             if log_datetime <= search_to:
-#                 search_results[log_datetime] = log_text
-#         return search_results or None
-#     elif datetime_to_search[-3:] == '/..' and len(datetime_to_search) == 26:
-#         search_from = datetime.strptime(datetime_to_search[:-3], "%Y-%m-%d %H:%M:%S.%f")
-#         search_results = {}
-#         for log_datetime, log_text in log_dictionary.items():
-#             if log_datetime >= search_from:
-#                 search_results[log_datetime] = log_text
-#         return search_results or None
-#     elif datetime_to_search[:1] == '=' and len(datetime_to_search) == 24:
-#         search_exact = datetime.strptime(datetime_to_search[1:], "%Y-%m-%d %H:%M:%S.%f")
-#         search_results = {}
-#         for log_datetime, log_text in log_dictionary.items():
-#             if log_datetime == search_exact:
-#                 search_results[log_datetime] = log_text
-#         return search_results or None
-#     elif datetime_to_search[23:-23] == '|' and len(datetime_to_search) == 47:
-#         datetime_from, datetime_to = datetime_to_search.split('|')
-#         search_from_to = (
-#             datetime.strptime(datetime_from, "%Y-%m-%d %H:%M:%S.%f"),
-#             datetime.strptime(datetime_to, "%Y-%m-%d %H:%M:%S.%f")
-#         )
-#         search_results = {}
-#         for log_datetime, log_text in log_dictionary.items():
-#             if search_from_to[0] <= log_datetime <= search_from_to[1]:
-#                 search_results[log_datetime] = log_text
-#         return search_results or None
-#     else:
-#         return None
+# log_dict = {
+#     datetime(2023, 9, 30, 10, 0): "Error: Something went wrong",
+#     datetime(2023, 9, 30, 11, 0): "Info: Task completed successfully",
+#     datetime(2023, 9, 30, 12, 0): "Warning: Disk space low",
+# }
 #
-#
-# date_input = "=2024-12-12 00:11:14.384"
-#
-# result_dates = datetime_converter_searcher(log_dict, date_input)
-# print("===========================================================================")
-# print("date search = ", result_dates)
-# print("===========================================================================")
+
+def datetime_converter_searcher(log_dictionary, datetime_to_search=None):
+    if datetime_to_search is None:
+        return None
+    elif datetime_to_search[:3] == '../' and len(datetime_to_search) == 26:
+        search_to = datetime.strptime(datetime_to_search[3:], "%Y-%m-%d %H:%M:%S.%f")
+        # Initialize an empty dictionary to store the filtered results
+        search_results = {}
+        for log_datetime, log_text in log_dictionary.items():
+            if log_datetime <= search_to:
+                search_results[log_datetime] = log_text
+        return search_results or None
+    elif datetime_to_search[-3:] == '/..' and len(datetime_to_search) == 26:
+        search_from = datetime.strptime(datetime_to_search[:-3], "%Y-%m-%d %H:%M:%S.%f")
+        # Initialize an empty dictionary to store the filtered results
+        search_results = {}
+        for log_datetime, log_text in log_dictionary.items():
+            if log_datetime >= search_from:
+                search_results[log_datetime] = log_text
+        return search_results or None
+    elif datetime_to_search[:1] == '=' and len(datetime_to_search) == 24:
+        search_exact = datetime.strptime(datetime_to_search[1:], "%Y-%m-%d %H:%M:%S.%f")
+        # Initialize an empty dictionary to store the filtered results
+        search_results = {}
+        for log_datetime, log_text in log_dictionary.items():
+            if log_datetime == search_exact:
+                search_results[log_datetime] = log_text
+        return search_results or None
+    elif datetime_to_search[23:-23] == '|' and len(datetime_to_search) == 47:
+        datetime_from, datetime_to = datetime_to_search.split('|')
+        search_from_to = (
+            datetime.strptime(datetime_from, "%Y-%m-%d %H:%M:%S.%f"),
+            datetime.strptime(datetime_to, "%Y-%m-%d %H:%M:%S.%f")
+        )
+        # Initialize an empty dictionary to store the filtered results
+        search_results = {}
+        for log_datetime, log_text in log_dictionary.items():
+            if search_from_to[0] <= log_datetime <= search_from_to[1]:
+                search_results[log_datetime] = log_text
+        return search_results or None
 
 
 def search_by_text(log_dictionary1, search_text=None, exclude_text=None):
+    # Initialize an empty dictionary to store the filtered results
     search_results = {}
     for log_datetime, log_text in log_dictionary1.items():
         # Convert all strings to lowercase for ease of search
@@ -113,12 +117,48 @@ def search_by_text(log_dictionary1, search_text=None, exclude_text=None):
             # Only exclude_text provided
             if exclude_text.lower() not in log_text_lower:
                 search_results[log_datetime] = log_text
-
     return search_results or None
 
 
-in_text = 'london'
-excl_text = 'error greeenfuckingday'
+dates = "2024-12-12 00:11:14.384/.."
+texts = None
+excludes = "http"
+full = True
 
-text_results = search_by_text(log_dict, in_text, excl_text)
-print("text results = ", text_results)
+# Perform the datetime search only if dates is not None
+if dates is not None:
+    datetime_results = datetime_converter_searcher(log_dict, dates)
+else:
+    datetime_results = None
+
+# Perform the text search only if texts is not None
+if texts is not None or excludes is not None:
+    text_results = search_by_text(log_dict, texts, excludes)
+else:
+    text_results = None
+
+# Initialize an empty dictionary to store the filtered results
+filtered_results = {}
+
+# Check which filter was applied and populate filtered_results accordingly
+if datetime_results and text_results:
+    # Both datetime and text filters are applied
+    for log_datetime, log_text in datetime_results.items():
+        if log_datetime in text_results:
+            filtered_results[log_datetime] = log_text
+elif datetime_results:
+    # Only datetime filter is applied
+    filtered_results = datetime_results
+elif text_results:
+    # Only text filter is applied
+    filtered_results = text_results
+
+if filtered_results:
+    # Initialize an empty dictionary and populate it with a for loop
+    result_dict = {}
+    for log_datetime, log_text in filtered_results.items():
+        result_dict[str(log_datetime)] = log_text
+
+    print(result_dict)
+else:
+    print("No matching entries found.")
