@@ -5,9 +5,9 @@ import access
 # /accounts/private/v1/admin/requests/csv/import
 # send post request with file each minute for 60 minutes
 # specify api and creds
-api_url = ""
-email = ""
-password = ""
+api_url = "https://api-mob1.ebanq-qa.com"
+email = "igad"
+password = "Password1!"
 
 duration = 3600  # 1 hour in seconds
 interval = 60  # 60 seconds
